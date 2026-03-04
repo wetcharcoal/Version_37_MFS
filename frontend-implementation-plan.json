@@ -1,0 +1,60 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Fix Profile view membership-based loading and error handling (frontend)",
+  "requirements": [
+    {
+      "id": "REQ-2",
+      "summary": "Update Profile view loading flow to use membership-resolution method and reliably handle multi-membership selection and failures without blank screens.",
+      "acceptanceCriteria": [
+        "When navigating to the Profile view, the app does not render a blank screen even if membership/profile queries reject or return null.",
+        "If the user has exactly one valid membership, the Profile view loads that organization profile automatically.",
+        "If the user has multiple memberships and no valid `selectedProfileId` is set (or it is invalid), the organization chooser dialog is shown and selecting an organization causes the Profile view to load that profile.",
+        "If membership/profile resolution fails (including due to Unauthorized), the UI shows a readable English error state using the existing fallback UI pattern (e.g., `ProfileLoadFallbackCard`) and provides a working retry action."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Update Profile-related query hooks to use the backend membership-resolution method (use actor.getGroupsByCaller() instead of actor.getProfileMemberships()) within the Profile loading flow, and ensure membership selection logic (single membership auto-select; multiple memberships return null until user selects; invalid stored selection is ignored)."
+        },
+        {
+          "path": "frontend/src/pages/HomePage.tsx",
+          "operation": "modify",
+          "description": "Adjust the Profile view rendering branches to explicitly handle multi-membership selection (prefer showing the OrganizationProfileChooserDialog flow when memberships > 1 and no valid profile is selected) and to render ProfileLoadFallbackCard (not a blank screen) when profile or membership loading fails; include membership query error handling in the decision tree."
+        },
+        {
+          "path": "frontend/src/components/ProfileLoadFallbackCard.tsx",
+          "operation": "modify",
+          "description": "Optionally enhance the fallback card to support displaying a provided, readable English error message (while keeping the existing retry and choose-organization actions) so failures in membership/profile loading can surface a clear user-visible state."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Add defensive error handling in profile/membership hooks so authorization traps/rejections become safe values and do not prevent Profile routing decisions.",
+      "acceptanceCriteria": [
+        "`useProfile()` does not throw if `getCallerUserProfile` or membership resolution rejects; it returns `null` and allows the UI to render the chooser/fallback states.",
+        "`useGetCallerUserProfile()` does not leave the app in an error-only state when the backend rejects due to authorization; it returns `null` (or a safe value) and the UI continues to the appropriate flow.",
+        "React Query error states for Profile-related queries are handled such that the Profile screen shows a user-visible fallback instead of getting stuck or crashing."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Harden useProfile() to catch backend rejections during getCallerUserProfile() and treat them as a safe null result, then proceed to membership-based profile resolution; ensure any thrown errors from profile/membership fetches are either converted to safe values (null/[]) or are surfaced in a controlled way that HomePage can render via ProfileLoadFallbackCard."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Harden useGetCallerUserProfile() so backend authorization traps/rejections are caught and converted to a safe null return (instead of creating an unrecoverable error state), while preserving correct loading state behavior tied to actor/identity availability."
+        },
+        {
+          "path": "frontend/src/pages/HomePage.tsx",
+          "operation": "modify",
+          "description": "Handle React Query error states from Profile-related queries (including membership resolution) by routing them into the existing fallback UI (ProfileLoadFallbackCard) with a working retry action that invalidates the relevant React Query keys."
+        }
+      ]
+    }
+  ]
+}

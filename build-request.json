@@ -1,0 +1,93 @@
+{
+  "kind": "build_request",
+  "title": "Fix Profile view failing to load when user has organization memberships",
+  "priority": "high",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Backend: Ensure there is a stable, query-only method for resolving a user’s organization/group memberships (e.g., implement `getGroupsByUser(user : Principal)` and/or `getGroupsByCaller()`), using the existing membership source of truth (`profileMembers`/`getProfileMemberships`). This method must not cause the Profile page to fail to render due to authorization traps during membership resolution.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-6",
+          "msg-8"
+        ],
+        "quotes": [
+          "Try the following solutions: The backend method: getGroupsByUser or whatever function resolves group membership"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A query method exists that returns the caller’s memberships (or a specified user’s memberships) derived from `profileMembers`/profiles.",
+        "Calling the membership-resolution method does not `Debug.trap` in normal logged-in scenarios; it returns an empty list or a safe result when the caller lacks permissions rather than causing a frontend-breaking rejection.",
+        "The returned membership objects include enough information for the frontend to select a profile (at minimum: `profileId`, `organizationName`, and `role` if available)."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Frontend: Update the Profile loading flow used by the Profile view (currently within `frontend/src/pages/HomePage.tsx` and the query logic in `frontend/src/hooks/useQueries.ts`) to use the backend’s membership-resolution method and handle authorization/rejection errors without breaking rendering. The Profile view must reliably choose a profile when the user has exactly one membership, prompt the organization chooser when the user has multiple memberships and none is selected, and show a user-visible fallback state (not a blank screen) when loading fails.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-6",
+          "msg-7",
+          "msg-8"
+        ],
+        "quotes": [
+          "The React file: the Profile page component (likely Profile.tsx or a similar path)",
+          "the Profile page does not load correctly based on group membership. The page is still returns an error still. let's go over why that may still be and how we can address the issue.",
+          "Try the following solutions: ... The React file: the Profile page component (likely Profile.tsx or a similar path)"
+        ]
+      },
+      "acceptanceCriteria": [
+        "When navigating to the Profile view, the app does not render a blank screen even if membership/profile queries reject or return null.",
+        "If the user has exactly one valid membership, the Profile view loads that organization profile automatically.",
+        "If the user has multiple memberships and no valid `selectedProfileId` is set (or it is invalid), the organization chooser dialog is shown and selecting an organization causes the Profile view to load that profile.",
+        "If membership/profile resolution fails (including due to Unauthorized), the UI shows a readable English error state using the existing fallback UI pattern (e.g., `ProfileLoadFallbackCard`) and provides a working retry action."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Frontend: Add defensive error handling in `useProfile()` and `useGetCallerUserProfile()` (and any other profile/membership fetches used by the Profile view) so that backend authorization traps/rejections are converted into safe return values (e.g., `null`/`[]`) and do not propagate as uncaught query errors that prevent the Profile view from determining membership-based routing.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-7",
+          "msg-8"
+        ],
+        "quotes": [
+          "the Profile page does not load correctly based on group membership. The page is still returns an error still.",
+          "Try the following solutions: ... getGroupsByUser ... Profile page component"
+        ]
+      },
+      "acceptanceCriteria": [
+        "`useProfile()` does not throw if `getCallerUserProfile` or membership resolution rejects; it returns `null` and allows the UI to render the chooser/fallback states.",
+        "`useGetCallerUserProfile()` does not leave the app in an error-only state when the backend rejects due to authorization; it returns `null` (or a safe value) and the UI continues to the appropriate flow.",
+        "React Query error states for Profile-related queries are handled such that the Profile screen shows a user-visible fallback instead of getting stuck or crashing."
+      ]
+    }
+  ],
+  "constraints": [
+    "Backend must remain a single Motoko actor in `backend/main.mo`.",
+    "Do not edit files under `frontend/src/components/ui` or other immutable paths listed in SYSTEM_CONTEXT.",
+    "Use English for any user-facing text."
+  ],
+  "nonGoals": [
+    "Implement third-party authentication or any auth provider besides Internet Identity.",
+    "Introduce external databases or additional backend services.",
+    "Add new unrelated Profile UI features beyond fixing membership-based loading and error handling."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
+  }
+}

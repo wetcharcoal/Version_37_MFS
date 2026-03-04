@@ -1,0 +1,50 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-frontend-update-the-profile-loading-flow-used-by-the-profile-view-currently-within-frontend-src-pages-homepage-tsx-and-the-query-logic-in-frontend-src-hooks-usequeries-ts-to-use-the-backend-s-membership-resolution-method-and-handle-authorization-rejection-errors-without-breaking-rendering-the-profile-view-must-reliably-choose-a-profile-when-the-user-has-exactly-one-membership-prompt-the-organization-chooser-when-the-user-has-multiple-memberships-and-none-is-selected-and-show-a-user-visible-fallback-state-not-a-blank-screen-when-loading-fails",
+      "featureTitle": "Frontend: Update the Profile loading flow used by the Profile view (currently within `frontend/src/pages/HomePage.tsx` and the query logic in `frontend/src/hooks/useQueries.ts`) to use the backend’s membership-resolution method and handle authorization/rejection errors without breaking rendering. The Profile view must reliably choose a profile when the user has exactly one membership, prompt the organization chooser when the user has multiple memberships and none is selected, and show a user-visible fallback state (not a blank screen) when loading fails.",
+      "files": [
+        "frontend/src/components/ProfileLoadFallbackCard.tsx",
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/HomePage.tsx"
+      ],
+      "components": [
+        "blob-storage@1.1.2",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "authorization@1.0.1",
+        "github-export-icp-cli@1.0.0",
+        "user-approval@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-frontend-add-defensive-error-handling-in-useprofile-and-usegetcalleruserprofile-and-any-other-profile-membership-fetches-used-by-the-profile-view-so-that-backend-authorization-traps-rejections-are-converted-into-safe-return-values-e-g-null-and-do-not-propagate-as-uncaught-query-errors-that-prevent-the-profile-view-from-determining-membership-based-routing",
+      "featureTitle": "Frontend: Add defensive error handling in `useProfile()` and `useGetCallerUserProfile()` (and any other profile/membership fetches used by the Profile view) so that backend authorization traps/rejections are converted into safe return values (e.g., `null`/`[]`) and do not propagate as uncaught query errors that prevent the Profile view from determining membership-based routing.",
+      "files": [
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/HomePage.tsx"
+      ],
+      "components": [
+        "blob-storage@1.1.2",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "authorization@1.0.1",
+        "github-export-icp-cli@1.0.0",
+        "user-approval@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

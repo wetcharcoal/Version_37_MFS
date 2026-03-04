@@ -1,0 +1,36 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-05T19:33:47.479Z",
+  "summary": "Frontend updates implement safer Profile loading via `getGroupsByCaller()` and add a richer fallback UI, but the diff summary does not provide direct evidence that the backend membership-resolution query method was added, and the frontend’s “safe return values” approach may prevent the UI from detecting membership-resolution failures and showing the required fallback state.",
+  "missing_requirements": [
+    {
+      "id": "REQ-1",
+      "requirement": "Backend must provide a stable, query-only membership-resolution method (e.g., `getGroupsByCaller()` / `getGroupsByUser(user)`) derived from `profileMembers`/`getProfileMemberships`, returning safe results (no traps) and including `profileId`, `organizationName`, and `role`.",
+      "reason": "The frontend now calls `actor.getGroupsByCaller()`, but the provided `backend/main.mo` diff is truncated and does not show any definition/export of `getGroupsByCaller()`/`getGroupsByUser()` or its non-trapping behavior and returned fields.",
+      "evidence": [
+        "backend/main.mo (truncated)",
+        "frontend/src/hooks/useQueries.ts (uses actor.getGroupsByCaller())"
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "requirement": "When membership/profile resolution fails (including Unauthorized), the Profile view should show a readable English error fallback (e.g., `ProfileLoadFallbackCard`) with a working retry action, rather than a blank screen.",
+      "reason": "`useGetProfileMemberships()` catches errors and returns `[]` without rethrowing, which means `membershipsError` may never be set; `HomePage`’s fallback condition relies on `membershipsError` or `memberships.length > 0`, so a membership-resolution failure that returns `[]` could avoid both the chooser and fallback states.",
+      "evidence": [
+        "frontend/src/hooks/useQueries.ts (useGetProfileMemberships returns [] on catch)",
+        "frontend/src/pages/HomePage.tsx (fallback condition checks membershipsError or (!profile && memberships.length > 0))"
+      ]
+    }
+  ],
+  "hallucinated_features": [],
+  "confidence": 0.62,
+  "changed_files": [
+    "backend/main.mo",
+    "frontend-file-summaries.txt",
+    "frontend/src/components/ProfileLoadFallbackCard.tsx",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/HomePage.tsx",
+    "project_state.json"
+  ]
+}

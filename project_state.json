@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "New project",
+  "architectural_notes": [
+    "Profile page behavior depends on group-membership resolution from a backend method (e.g., getGroupsByUser) and corresponding frontend Profile page component logic (e.g., Profile.tsx)."
+  ],
+  "known_issues": [
+    "Profile page does not load correctly based on group membership; page still returns an error."
+  ],
+  "isFixRequest": true,
+  "existing_features": [
+    {
+      "id": "feature-frontend-update-the-profile-loading-flow-used-by-the-profile-view-currently-within-frontend-src-pages-homepage-tsx-and-the-query-logic-in-frontend-src-hooks-usequeries-ts-to-use-the-backend-s-membership-resolution-method-and-handle-authorization-rejection-errors-without-breaking-rendering-the-profile-view-must-reliably-choose-a-profile-when-the-user-has-exactly-one-membership-prompt-the-organization-chooser-when-the-user-has-multiple-memberships-and-none-is-selected-and-show-a-user-visible-fallback-state-not-a-blank-screen-when-loading-fails",
+      "title": "Frontend: Update the Profile loading flow used by the Profile view (currently within `frontend/src/pages/HomePage.tsx` and the query logic in `frontend/src/hooks/useQueries.ts`) to use the backend’s membership-resolution method and handle authorization/rejection errors without breaking rendering. The Profile view must reliably choose a profile when the user has exactly one membership, prompt the organization chooser when the user has multiple memberships and none is selected, and show a user-visible fallback state (not a blank screen) when loading fails.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-frontend-add-defensive-error-handling-in-useprofile-and-usegetcalleruserprofile-and-any-other-profile-membership-fetches-used-by-the-profile-view-so-that-backend-authorization-traps-rejections-are-converted-into-safe-return-values-e-g-null-and-do-not-propagate-as-uncaught-query-errors-that-prevent-the-profile-view-from-determining-membership-based-routing",
+      "title": "Frontend: Add defensive error handling in `useProfile()` and `useGetCallerUserProfile()` (and any other profile/membership fetches used by the Profile view) so that backend authorization traps/rejections are converted into safe return values (e.g., `null`/`[]`) and do not propagate as uncaught query errors that prevent the Profile view from determining membership-based routing.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Backend: Ensure there is a stable, query-only method for resolving a user’s organization/group memberships (e.g., implement `getGroupsByUser(user : Principal)` and/or `getGroupsByCaller()`), using the existing membership source of truth (`profileMembers`/`getProfileMemberships`). This method must not cause the Profile page to fail to render due to authorization traps during membership resolution.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "status": "pending"
+    }
+  ],
+  "projectName": "Fix Profile view failing to load when user has organization memberships",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}
