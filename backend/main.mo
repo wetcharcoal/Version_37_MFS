@@ -349,28 +349,28 @@ actor MontrealFoodSystem {
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
       Debug.trap("Unauthorized: Only users can register file references");
     };
-    Registry.add(registry, path, hash);
+    storeFileReference(path, hash);
   };
 
   public query ({ caller }) func getFileReference(path : Text) : async Registry.FileReference {
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
       Debug.trap("Unauthorized: Only users can access file references");
     };
-    Registry.get(registry, path);
+    fetchFileReference(path);
   };
 
   public query ({ caller }) func listFileReferences() : async [Registry.FileReference] {
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
       Debug.trap("Unauthorized: Only users can list file references");
     };
-    Registry.list(registry);
+    fetchAllFileReferences();
   };
 
   public shared ({ caller }) func dropFileReference(path : Text) : async () {
     if (not AccessControl.hasPermission(accessControlState, caller, #user)) {
       Debug.trap("Unauthorized: Only users can drop file references");
     };
-    Registry.remove(registry, path);
+    deleteFileReference(path);
   };
 
   public shared ({ caller }) func registerProfile(
