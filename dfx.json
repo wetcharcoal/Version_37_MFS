@@ -25,11 +25,5 @@
         "args": ""
       }
     },
-    "output_env_file": ".env",
-    "networks": {
-      "local": {
-        "bind": "127.0.0.1:4943",
-        "type": "plain"
-      }
-    }
+    "output_env_file": ".env"
   }

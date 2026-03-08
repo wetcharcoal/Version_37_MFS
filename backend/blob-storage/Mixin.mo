@@ -1,6 +1,6 @@
 import Registry "registry";
 
-module BlobStorage(registry : Registry.Registry) {
+mixin(registry : Registry.Registry) {
   // Blob storage mixin for file references (header logo, profile pictures, event images).
   // Wraps Registry operations; main.mo adds authorization and exposes the public API.
 
@@ -10,12 +10,14 @@ module BlobStorage(registry : Registry.Registry) {
   };
 
   /// Retrieves the file reference for a path; traps if not found.
-  public query func fetchFileReference(path : Text) : Registry.FileReference {
+  /// Plain sync function so main.mo's query methods can call it (no send capability needed).
+  func fetchFileReference(path : Text) : Registry.FileReference {
     Registry.get(registry, path);
   };
 
   /// Returns all registered file references.
-  public query func fetchAllFileReferences() : [Registry.FileReference] {
+  /// Plain sync function so main.mo's query methods can call it (no send capability needed).
+  func fetchAllFileReferences() : [Registry.FileReference] {
     Registry.list(registry);
   };
 
@@ -23,4 +25,4 @@ module BlobStorage(registry : Registry.Registry) {
   public func deleteFileReference(path : Text) {
     Registry.remove(registry, path);
   };
-};
+}

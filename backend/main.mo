@@ -14,24 +14,24 @@ import UserApproval "user-approval/approval";
 
 
 
-actor MontrealFoodSystem {
+persistent actor MontrealFoodSystem {
   transient let textMap = OrderedMap.Make<Text>(Text.compare);
   transient let principalMap = OrderedMap.Make<Principal>(Principal.compare);
 
-  let accessControlState = AccessControl.initState();
-  let userApprovalState = UserApproval.initState(accessControlState);
+  transient let accessControlState = AccessControl.initState();
+  transient let userApprovalState = UserApproval.initState(accessControlState);
 
-  var profiles : OrderedMap.Map<Text, Profile> = textMap.empty();
-  var needs : OrderedMap.Map<Text, Need> = textMap.empty();
-  var resources : OrderedMap.Map<Text, ResourceHave> = textMap.empty();
-  var categoryMatches : OrderedMap.Map<Text, CategoryMatch> = textMap.empty();
-  var events : OrderedMap.Map<Text, Event> = textMap.empty();
-  var userProfiles : OrderedMap.Map<Principal, UserProfile> = principalMap.empty();
-  var displayNames : OrderedMap.Map<Principal, Text> = principalMap.empty();
-  var profileMembers : OrderedMap.Map<Text, OrderedMap.Map<Principal, ProfileMember>> = textMap.empty();
-  var joinRequests : OrderedMap.Map<Text, List.List<JoinRequest>> = textMap.empty();
+  transient var profiles : OrderedMap.Map<Text, Profile> = textMap.empty();
+  transient var needs : OrderedMap.Map<Text, Need> = textMap.empty();
+  transient var resources : OrderedMap.Map<Text, ResourceHave> = textMap.empty();
+  transient var categoryMatches : OrderedMap.Map<Text, CategoryMatch> = textMap.empty();
+  transient var events : OrderedMap.Map<Text, Event> = textMap.empty();
+  transient var userProfiles : OrderedMap.Map<Principal, UserProfile> = principalMap.empty();
+  transient var displayNames : OrderedMap.Map<Principal, Text> = principalMap.empty();
+  transient var profileMembers : OrderedMap.Map<Text, OrderedMap.Map<Principal, ProfileMember>> = textMap.empty();
+  transient var joinRequests : OrderedMap.Map<Text, List.List<JoinRequest>> = textMap.empty();
 
-  let registry = Registry.new();
+  transient let registry = Registry.new();
   include BlobStorage(registry);
 
   type UserProfile = {

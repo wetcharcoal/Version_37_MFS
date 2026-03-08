@@ -1,0 +1,200 @@
+type UserRole = 
+ variant {
+   admin;
+   guest;
+   user;
+ };
+type UserProfile = record {profileId: text;};
+type UserApprovalInfo = 
+ record {
+   "principal": principal;
+   status: ApprovalStatus;
+ };
+type ResourceHave = 
+ record {
+   category: ResourceCategory;
+   description: text;
+   id: text;
+   owner: principal;
+   profileId: text;
+ };
+type ResourceCategory = 
+ variant {
+   distributionSpace;
+   equipment;
+   foodDrink;
+   kitchenSpace;
+   other;
+   publicity;
+   storageSpace;
+ };
+type ProfileRole = 
+ variant {
+   clubAdmin;
+   user;
+ };
+type ProfileMember = 
+ record {
+   displayName: opt text;
+   "principal": principal;
+   role: ProfileRole;
+ };
+type Profile = 
+ record {
+   address: text;
+   bio: opt text;
+   email: text;
+   functions: vec FunctionType;
+   id: text;
+   needs: vec text;
+   organizationName: text;
+   owner: principal;
+   phone: text;
+   profilePicture: opt text;
+   resources: vec text;
+ };
+type Need = 
+ record {
+   category: ResourceCategory;
+   description: text;
+   endDate: int;
+   id: text;
+   owner: principal;
+   profileId: text;
+   startDate: int;
+ };
+type MembershipInfo = 
+ record {
+   organizationName: text;
+   profileId: text;
+   role: ProfileRole;
+ };
+type JoinRequestStatus = 
+ variant {
+   approved;
+   denied;
+   pending;
+ };
+type JoinRequest = 
+ record {
+   displayName: opt text;
+   "principal": principal;
+   profileId: text;
+   status: JoinRequestStatus;
+ };
+type FunctionType = 
+ variant {
+   distribution;
+   education;
+   equipmentSpace;
+   processing;
+   production;
+   wasteManagement;
+ };
+type FileReference = 
+ record {
+   hash: text;
+   path: text;
+ };
+type Event = 
+ record {
+   creatorProfileId: text;
+   description: text;
+   id: text;
+   image: opt text;
+   location: text;
+   needs: vec text;
+   owner: principal;
+   time: int;
+ };
+type CategoryMatch = 
+ record {
+   category: ResourceCategory;
+   needIds: vec text;
+   resourceIds: vec text;
+ };
+type ApprovalStatus = 
+ variant {
+   approved;
+   pending;
+   rejected;
+ };
+service : {
+  addProfileMember: (profileId: text, "principal": principal, role:
+   ProfileRole) -> ();
+  adminAssignProfileMember: (profileId: text, "principal": principal, role:
+   ProfileRole) -> ();
+  adminCreateProfile: (id: text, organizationName: text, functions:
+   vec FunctionType, address: text, phone: text, email: text, bio: opt text,
+   profilePicture: opt text) -> ();
+  adminGetAllEvents: () -> (vec Event) query;
+  adminGetAllNeeds: () -> (vec Need) query;
+  adminGetAllResources: () -> (vec ResourceHave) query;
+  adminSearchEvents: (searchTerm: text) -> (vec Event) query;
+  adminSearchNeeds: (searchTerm: text) -> (vec Need) query;
+  adminSearchResources: (searchTerm: text) -> (vec ResourceHave) query;
+  approveJoinRequest: (profileId: text, memberPrincipal: principal, role:
+   ProfileRole) -> ();
+  assignCallerUserRole: (user: principal, role: UserRole) -> ();
+  cleanOrphanedRecords: () -> ();
+  createEvent: (id: text, creatorProfileId: text, location: text,
+   description: text, time: int, image: opt text, needs: vec text) -> ();
+  createNeed: (id: text, profileId: text, description: text, category:
+   ResourceCategory, startDate: int, endDate: int) -> ();
+  createResource: (id: text, profileId: text, description: text, category:
+   ResourceCategory) -> ();
+  deleteEvent: (id: text) -> ();
+  deleteFileReference: (path: text) -> () oneway;
+  deleteNeed: (id: text) -> ();
+  deleteProfile: (id: text) -> ();
+  deleteResource: (id: text) -> ();
+  denyJoinRequest: (profileId: text, memberPrincipal: principal) -> ();
+  dropFileReference: (path: text) -> ();
+  getAllEvents: () -> (vec Event) query;
+  getAllNeeds: () -> (vec Need) query;
+  getAllProfiles: () -> (vec Profile) query;
+  getAllResources: () -> (vec ResourceHave) query;
+  getCallerUserProfile: () -> (opt UserProfile) query;
+  getCallerUserRole: () -> (UserRole) query;
+  getCategoryMatches: (category: ResourceCategory) ->
+   (opt CategoryMatch) query;
+  getDisplayName: ("principal": principal) -> (opt text) query;
+  getEvent: (id: text) -> (opt Event) query;
+  getFileReference: (path: text) -> (FileReference) query;
+  getGroupsByCaller: () -> (vec MembershipInfo) query;
+  getGroupsByUser: (user: principal) -> (vec MembershipInfo) query;
+  getJoinRequestStatus: (_profileId: text) -> (JoinRequestStatus) query;
+  getNeed: (id: text) -> (opt Need) query;
+  getPendingJoinRequestsForProfile: (profileId: text) ->
+   (vec JoinRequest) query;
+  getProfile: (id: text) -> (opt Profile) query;
+  getProfileMembers: (profileId: text) -> (vec ProfileMember) query;
+  getProfileMemberships: () -> (vec MembershipInfo) query;
+  getResourceHave: (id: text) -> (opt ResourceHave) query;
+  getUserProfile: (user: principal) -> (opt UserProfile) query;
+  initializeAccessControl: () -> ();
+  isCallerAdmin: () -> (bool) query;
+  isCallerApproved: () -> (bool) query;
+  listApprovals: () -> (vec UserApprovalInfo) query;
+  listFileReferences: () -> (vec FileReference) query;
+  registerFileReference: (path: text, hash: text) -> ();
+  registerProfile: (id: text, organizationName: text, functions:
+   vec FunctionType, address: text, phone: text, email: text, bio: opt text,
+   profilePicture: opt text) -> ();
+  removeProfileMember: (profileId: text, "principal": principal) -> ();
+  requestApproval: () -> ();
+  requestJoin: (profileId: text) -> ();
+  resetBackendState: () -> ();
+  saveCallerUserProfile: (profile: UserProfile) -> ();
+  searchNeeds: (searchTerm: text) -> (vec Need) query;
+  searchProfiles: (searchTerm: text) -> (vec Profile) query;
+  searchResources: (searchTerm: text) -> (vec ResourceHave) query;
+  setApproval: (user: principal, status: ApprovalStatus) -> ();
+  setDisplayName: (displayName: text) -> ();
+  storeFileReference: (path: text, hash: text) -> () oneway;
+  updateEvent: (id: text, location: text, description: text, time: int,
+   image: opt text, needs: vec text) -> ();
+  updateProfile: (id: text, organizationName: text, functions:
+   vec FunctionType, address: text, phone: text, email: text, bio: opt text,
+   profilePicture: opt text) -> ();
+}
